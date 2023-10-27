@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:xtra_firebase/Pages/login_page.dart';
+import 'package:xtra_firebase/Pages/settings_page.dart';
 
 void main() {
   runApp(const MyApp());

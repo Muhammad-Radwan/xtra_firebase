@@ -13,23 +13,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  List<Us.user>? user;
-
-  Future<void> _getUserData(String mobile) async {
-    var aa = await jsonServices().userLogin(mobile);
-
-    if (aa == null) {
-      user = null;
-    } else {
-      user = aa;
-    }
-  }
+  String? userName;
 
   TextEditingController myController = TextEditingController();
   @override
   void initState() {
     super.initState();
-    //_getUserData(myController.text);
   }
 
   @override
@@ -68,19 +57,35 @@ class _LoginPageState extends State<LoginPage> {
                     elevation: 10,
                     color: Color.fromARGB(255, 34, 169, 191),
                     minWidth: screenheight,
-                    onPressed: () {
-                      _getUserData(myController.text);
-                      if (user == null) {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext) {
-                              return AlertDialog(
-                                title: Text('Attention'),
-                                content: Text('Invaled User Credentials'),
-                              );
-                            });
+                    onPressed: () async {
+                      var aa =
+                          await jsonServices().userLogin(myController.text);
+                      if (aa == null) {
+                        return;
                       }
-                      setState(() {});
+                      try {
+                        setState(() {
+                          userName = ' welcome: ${aa[0].agentName}';
+                        });
+                      } catch (ex) {
+                        setState(() {
+                          userName = 'no user found';
+                          myController.text = '';
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                    title: Text('Attention'),
+                                    content: Text('user not found'),
+                                    actions: [
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Retry'))
+                                    ],
+                                  ));
+                        });
+                      }
                     },
                     child: Text(
                       'Login',
@@ -89,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                     )),
                 SizedBox(height: 20),
                 Text(
-                  'Welcome ${user?[0].agentName}',
+                  '$userName',
                   style: GoogleFonts.changa(fontSize: 30),
                 )
               ]),
